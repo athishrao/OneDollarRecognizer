@@ -15,13 +15,6 @@ def receiver():
     result = [i[1:len(i)-2] for i in result]
     Xcoord, Ycoord = [(int)(i) for i in result[0].split(",")], [(int)(i) for i in result[1].split(",")]
     Xcoord, Ycoord = Xcoord[:len(Xcoord)-1], Ycoord[:len(Xcoord)-1]
-    # print("Data: ", Xcoord, Ycoord)
-    # print("Len in app.py: ", len(Xcoord))
-    # f= open("file.txt","a+")
-    # f.write("in app.py:")
-    # for i in range(len(Xcoord)):
-    #     f.write("(%1.2f, %1.2f)" % (Xcoord[i], Ycoord[i]))
-    # f.write("\n\n")
     if (len(Xcoord) < 35):
         return "Try again with more points!"
     string, score = recognizeOnline.recognize(Xcoord, Ycoord)
