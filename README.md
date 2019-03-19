@@ -7,6 +7,6 @@ The latter is an attempt to give users the feel of trying out the software, in r
 
 Steps to run:
 - [x] Clone this repo onto your local machine
-- [x] Download the following folder and place it in the same repo.
-- [x] Run python3 app.py
+- [x] Download and unzip the following folder http://depts.washington.edu/madlab/proj/dollar/xml.zip and place it in the same directory as the other files in this repo
+- [x] Run app.py
 - [x] Open https://0.0.0.0:80 and Voila!
