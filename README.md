@@ -1,3 +1,5 @@
+<h1> One Dollar Recognizer </h1>
+
 This is a simple python implementation of $1 recognizer. <br/>
 The crux of this repo is the **OneDollar.py** file which implements the shape recognizer as defined in the Wobbrock et al. paper. It is a simple geometric and triginometry based algorithm that helps recognize single stroke gestures with impeccable accuracy even with a small traning dataset. <br/>
 There are two files in this repo - **recognizeOffline.py** and **recognizeOnline.py**. The former has to do with simple verification of the working of the algorithm. You can view some testing functions that have been written to check the rigour of the algorithm. 
