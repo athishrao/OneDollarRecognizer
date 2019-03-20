@@ -10,3 +10,5 @@ Steps to run:
 - [x] Download and unzip the following folder http://depts.washington.edu/madlab/proj/dollar/xml.zip and place it in the same directory as the other files in this repo
 - [x] Run app.py
 - [x] Open http://0.0.0.0:80 and Voila!
+
+Visit athish.ml for hands on trial for the software.
