@@ -1,6 +1,7 @@
 import OneDollar
 import random
 import matplotlib
+import time
 matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 
@@ -11,7 +12,10 @@ def recognize(Xcoord, Ycoord):
     for i in symbols:
         symbolList.append(symbol(i))
     # random.shuffle(symbolList)
+    start = time.time()
     Final = Total(symbolList)
+    end = time.time()
+    print("Time elapsed: ", end - start)
     string = Final.recognize(Candidate)
     return string
 
@@ -22,9 +26,10 @@ def candidate(Xcoord, Ycoord):
     candidate = OneDollar.stroke(pointsList=candidate)
     candidate.length = len(Xcoord)
     candidate.resample(32)
-    candidate.rotToZero()
+    # candidate.rotToZero()
+    candidate.createDiffernceVector()
     candidate.scaleToSquare(100)
-    candidate.translateToZero()
+    # candidate.translateToZero()
     return candidate
 
 class Total:
@@ -41,7 +46,8 @@ class Total:
         return traningSet
     def recognize(self, candidate):
         templateList = self.getTrainingSet()
-        K, score = candidate.recognize(templateList)
+        K, score, j = candidate.newRecognize(templateList)
+        # K, score = candidate.newRecognize(templateList)
         print("The predicted shape is: ", K.name)
         print("The score is: ", score)
         return K.name, score
@@ -63,9 +69,10 @@ class symbol:
         for i in range(len(self.strokeList)):
             # print("Resampling %s%d"%(self.strokeList[i].name,i))
             self.strokeList[i].resample(n)
-            self.strokeList[i].rotToZero()
+            self.strokeList[i].createDiffernceVector()
+            # self.strokeList[i].rotToZero()
             self.strokeList[i].scaleToSquare(100)
-            self.strokeList[i].translateToZero()
+            # self.strokeList[i].translateToZero()
 
     def printSymbol(self):
         for i in range(self.length):
