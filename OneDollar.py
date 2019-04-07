@@ -5,16 +5,26 @@ import random
 def euclideanDist(pointA, pointB):
     return math.sqrt((pointA.x - pointB.x)**2 + (pointA.y - pointB.y)**2)
 
+def l2Norm(vector):
+    sumV = 0
+    for i in vector:
+        sumV += (i.distance())**2
+    return  math.sqrt(sumV)
+
 class points:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+    def distance(self):
+        return math.sqrt((self.x)**2 + (self.y)**2)
 
 class stroke:
     pointsList = list()
     resampledPointsList = list()
+    differnceVector = list()
     length = 0
     name = ""
+    nBestList = list()
     
     def __init__(self, name="candidate", pathname="na", candidate=True, pointsList = list()):
         if (candidate==False):
@@ -29,7 +39,22 @@ class stroke:
         else:
             self.resampledPointsList = list()
             self.pointsList = pointsList
+            self.nBestList = []
     
+    def __lt__(self, other):
+        # print("LT My: %s  Other: %s Result: %s" %(self.name, other.name, (self.name < other.name)))
+        return self.name < other.name
+
+    def __eq__(self, other):
+        # print("EQ My: %s  Other: %s" %(self.name, other.name))
+        return self.name == other.name
+
+    def __sub__(self, strokeObject):
+        tempList = list()
+        for i in range(len(self.differnceVector)):
+            tempList.append(points(self.differnceVector[i].x-strokeObject.differnceVector[i].x, self.differnceVector[i].y-strokeObject.differnceVector[i].y))
+        return tempList
+
     def printStroke(self):
         for i in range(self.length):
             print(self.pointsList[i].x, self.pointsList[i].y)
@@ -93,9 +118,6 @@ class stroke:
     
     # Calculate the centroid of the set of points
     def centroid(self):
-        # print("Len: ", len(self.resampledPointsList))
-        # print("Len Len:", self.length)
-        # print("In centroid stroke, length = ",  len(self.resampledPointsList))
         cx = sum([i.x for i in self.resampledPointsList])/len(self.resampledPointsList)
         cy = sum([i.y for i in self.resampledPointsList])/len(self.resampledPointsList)
         return points(cx, cy)
@@ -123,49 +145,27 @@ class stroke:
     def boundingBox(self):
         return points(0,0), points(100,100)
 
-    def pathDistance(self, A, B):
-        d = 0
-        for i in range(min(B.length, len(A))):
-            d += euclideanDist(A[i], B.resampledPointsList[i])
-        return d/len(A)
-
-    def distanceAtAngle(self, T, theta):
-        # print("In distanceAtAngle stroke, length = ",  len(self.resampledPointsList))
-        newPoints = self.rotateBy(theta)
-        d = self.pathDistance(newPoints, T)
-        return d
-
-    def distanceAtBestAngle(self, T, thetaA, thetaB, thetaDel):
-        goldenRatio = 0.5 * (-1.0 + math.sqrt(5.0))
-        x1 = goldenRatio*(thetaA) + (1-goldenRatio)*(thetaB)
-        f1 = self.distanceAtAngle(T, x1)
-        x2 = goldenRatio*(thetaB) + (1-goldenRatio)*(thetaA)
-        f2 = self.distanceAtAngle(T, x2)
-        while (abs(thetaA-thetaB) > thetaDel):
-            if (f1 < f2):
-                thetaB = x2
-                x2 = x1
-                f2 = f1
-                x1 = goldenRatio*(thetaA) + (1-goldenRatio)*(thetaB)
-                f1 = self.distanceAtAngle(T, x1)
-            else:
-                thetaA = x1
-                x1 = x2
-                f1 = f2
-                x2 = goldenRatio*(thetaB) + (1-goldenRatio)*(thetaA)
-                f2 = self.distanceAtAngle(T, x2)
-        return min(f1, f2)
-    
-    # Recognize the stroke against a list of tempates strokes
-    def recognize(self, template):
-        b = 10**10
-        theta = math.radians(45)
-        thetaDel = math.radians(2)
+    def newRecognize(self, template):
         size = 100
-        for T in template:
-            d = self.distanceAtBestAngle(T, -1*theta, theta, thetaDel)
-            if (d < b):
-                b = d
-                Tnew = T
+        bestTemplate, b = self.findResultantVector(template)
         score = (1 - (b/(0.5*(2*size**2))))
-        return Tnew, score
+        return bestTemplate, score
+
+    def createDiffernceVector(self):
+        centroid = self.centroid()
+        self.differnceVector = list()
+        for i in self.resampledPointsList:
+            self.differnceVector.append(points(centroid.x - i.x, centroid.y - i.y))
+        return 
+     
+    def findResultantVector(self, template):
+        self.createDiffernceVector()
+        minDist = 10**3
+        bestTemplate = template[0]
+        for T in template:
+            resultantVector = self - T
+            d = l2Norm(resultantVector)
+            if (minDist > d):
+                minDist = d
+                bestTemplate = T
+        return bestTemplate, d
